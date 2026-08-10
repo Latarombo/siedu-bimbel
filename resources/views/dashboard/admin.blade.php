@@ -9,8 +9,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <p class="text-sm text-gray-500">Total Siswa</p>
-                    <p class="text-3xl font-bold">{{ $totalSiswa }}</p>
+                    <p class="text-sm text-gray-500">Total Akun Orang Tua</p>
+                    <p class="text-3xl font-bold">{{ $totalOrangTua }}</p>
                 </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <p class="text-sm text-gray-500">Total Guru</p>
@@ -21,8 +21,8 @@
                     <p class="text-3xl font-bold text-green-600">{{ $pendaftaranAktif }}</p>
                 </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <p class="text-sm text-gray-500">Menunggu Pembayaran/Persetujuan</p>
-                    <p class="text-3xl font-bold text-amber-600">{{ $menungguPersetujuan }}</p>
+                    <p class="text-sm text-gray-500">Menunggu Pembayaran</p>
+                    <p class="text-3xl font-bold text-amber-600">{{ $menungguPembayaran }}</p>
                 </div>
             </div>
 

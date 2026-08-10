@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\SiswaProfile;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -16,9 +15,9 @@ use Illuminate\View\View;
 class RegisteredUserController extends Controller
 {
     /**
-     * Ketentuan Penggunaan #3: registrasi publik cuma boleh bikin akun
-     * role 'siswa'. Akun 'admin' lewat Seeder, akun 'guru' dibuat Admin
-     * lewat menu kelola data guru (F8) — bukan dari sini.
+     * Registrasi publik cuma bikin akun role 'orang_tua'. Data anak
+     * TIDAK diisi di sini — itu ditambahkan belakangan lewat menu
+     * "Kelola Profil Anak" di dashboard (F11 versi baru).
      */
     public function create(): View
     {
@@ -29,27 +28,24 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'phone' => 'required|string|max:20',
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            // Validasi Data #1: tanggal lahir wajib diisi saat registrasi,
-            // dipakai untuk hitung kategori usia (F5) tiap kali daftar kelas nanti.
-            // Batas realistis: maksimal 100 tahun lalu, minimal harus hari ini
-            // (tidak boleh tanggal masa depan atau tahun ngawur seperti 20000)
-            'tanggal_lahir' => 'required|date|after:'.now()->subYears(100)->format('Y-m-d').'|before_or_equal:today',
+            // Dua checkbox consent (gambar 1) — wajib dicentang, tidak bisa lanjut tanpanya
+            'consent_privasi' => 'accepted',
+            'consent_wali' => 'accepted',
         ]);
+
+        $now = now();
 
         $user = User::create([
-            'role' => 'siswa',
+            'role' => 'orang_tua',
             'name' => $request->name,
+            'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-        ]);
-
-        // F11: profil siswa (termasuk slot data Wali) dibuat sekaligus,
-        // data Wali-nya sendiri diisi belakangan lewat halaman profil.
-        SiswaProfile::create([
-            'user_id' => $user->id,
-            'tanggal_lahir' => $request->tanggal_lahir,
+            'privasi_disetujui_at' => $now,
+            'wali_disetujui_at' => $now,
         ]);
 
         event(new Registered($user));

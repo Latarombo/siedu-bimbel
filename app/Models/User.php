@@ -2,47 +2,35 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+#[Fillable(['role', 'name', 'email', 'phone', 'password', 'privasi_disetujui_at', 'wali_disetujui_at'])]
+#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
-
-    protected $fillable = [
-        'role',
-        'name',
-        'email',
-        'phone',
-        'password',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'privasi_disetujui_at' => 'datetime',
+            'wali_disetujui_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
-    // Relasi khusus role 'siswa' (F11)
-    public function siswaProfile(): HasOne
+    // F11 (versi baru): satu akun Orang Tua bisa punya banyak profil Anak
+    public function anak(): HasMany
     {
-        return $this->hasOne(SiswaProfile::class);
-    }
-
-    // Relasi khusus role 'siswa' — semua pendaftaran milik akun ini
-    public function pendaftaran(): HasMany
-    {
-        return $this->hasMany(Pendaftaran::class, 'siswa_id');
+        return $this->hasMany(Anak::class, 'orang_tua_id');
     }
 
     // Relasi khusus role 'guru' — kelas yang diampu (F10)
@@ -63,7 +51,6 @@ class User extends Authenticatable
         return $this->hasMany(NilaiProgres::class, 'dicatat_oleh');
     }
 
-    // Helper role check, dipakai di middleware
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
@@ -74,8 +61,14 @@ class User extends Authenticatable
         return $this->role === 'guru';
     }
 
-    public function isSiswa(): bool
+    public function isOrangTua(): bool
     {
-        return $this->role === 'siswa';
+        return $this->role === 'orang_tua';
+    }
+
+    // Bukti hukum consent sudah diberikan (dicek sebelum bisa akses fitur pendaftaran)
+    public function sudahMenyetujuiConsent(): bool
+    {
+        return $this->privasi_disetujui_at !== null && $this->wali_disetujui_at !== null;
     }
 }

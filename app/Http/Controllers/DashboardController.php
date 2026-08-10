@@ -7,10 +7,6 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    /**
-     * F1: Login terpusat berbasis role. Dashboard jadi satu pintu masuk,
-     * tapi kontennya beda tergantung role yang login.
-     */
     public function index(Request $request): View
     {
         $user = $request->user();
@@ -18,46 +14,42 @@ class DashboardController extends Controller
         return match ($user->role) {
             'admin' => $this->admin($user),
             'guru' => $this->guru($user),
-            'siswa' => $this->siswa($user),
+            'orang_tua' => $this->orangTua($user),
         };
     }
 
     private function admin($user): View
     {
-        // F15: ringkasan cepat untuk Admin
-        $totalSiswa = \App\Models\User::where('role', 'siswa')->count();
+        $totalOrangTua = \App\Models\User::where('role', 'orang_tua')->count();
         $totalGuru = \App\Models\User::where('role', 'guru')->count();
         $pendaftaranAktif = \App\Models\Pendaftaran::where('status', 'terdaftar')->count();
-        $menungguPersetujuan = \App\Models\Pendaftaran::where('status', 'menunggu_pembayaran')->count();
+        $menungguPembayaran = \App\Models\Pendaftaran::where('status', 'menunggu_pembayaran')->count();
 
         return view('dashboard.admin', compact(
-            'totalSiswa', 'totalGuru', 'pendaftaranAktif', 'menungguPersetujuan'
+            'totalOrangTua',
+            'totalGuru',
+            'pendaftaranAktif',
+            'menungguPembayaran'
         ));
     }
 
     private function guru($user): View
     {
-        // F12/F13: kelas yang diampu guru ini di periode aktif
         $kelasDiampu = $user->kelasDiampu()
             ->with(['mataPelajaran', 'periode'])
-            ->whereHas('periode', fn ($q) => $q->where('status', 'dibuka'))
+            ->whereHas('periode', fn($q) => $q->where('status', 'dibuka'))
             ->get();
 
         return view('dashboard.guru', compact('kelasDiampu'));
     }
 
-    private function siswa($user): View
+    private function orangTua($user): View
     {
-        // F4/F5: status pendaftaran terbaru milik siswa ini
-        $pendaftaran = $user->pendaftaran()
-            ->with(['kelas.mataPelajaran', 'periode'])
-            ->latest('diajukan_pada')
+        // F4/F5 (versi baru): semua anak milik akun ini + status pendaftaran tiap anak
+        $anak = $user->anak()
+            ->with(['pendaftaran.kelas.mataPelajaran', 'pendaftaran.periode'])
             ->get();
 
-        $butuhPersetujuanWali = $pendaftaran
-            ->where('status', 'menunggu_pembayaran')
-            ->filter(fn ($p) => $p->butuhPersetujuanWali() && ! $p->sudahDisetujuiWali());
-
-        return view('dashboard.siswa', compact('pendaftaran', 'butuhPersetujuanWali'));
+        return view('dashboard.orang-tua', compact('anak'));
     }
 }
