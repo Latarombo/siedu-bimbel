@@ -35,7 +35,7 @@ return new class extends Migration
                 'dibatalkan_timeout',    // Business Rule #2: >24 jam belum bayar/belum disetujui
                 'dibatalkan_tunggakan',  // Business Rule #7: >7 hari kerja telat cicilan
                 'dibatalkan_siswa',      // F14: siswa mengajukan pembatalan sendiri
-                'dibatalkan_pelanggaran',// F7: admin batalkan karena kecurigaan/pelanggaran
+                'dibatalkan_pelanggaran', // F7: admin batalkan karena kecurigaan/pelanggaran
                 'dibatalkan_kuota',      // F14: admin batalkan krn kuota minimum tak terpenuhi
             ])->default('menunggu_pembayaran');
 

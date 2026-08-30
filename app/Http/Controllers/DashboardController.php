@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pendaftaran;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -20,10 +22,10 @@ class DashboardController extends Controller
 
     private function admin($user): View
     {
-        $totalOrangTua = \App\Models\User::where('role', 'orang_tua')->count();
-        $totalGuru = \App\Models\User::where('role', 'guru')->count();
-        $pendaftaranAktif = \App\Models\Pendaftaran::where('status', 'terdaftar')->count();
-        $menungguPembayaran = \App\Models\Pendaftaran::where('status', 'menunggu_pembayaran')->count();
+        $totalOrangTua = User::where('role', 'orang_tua')->count();
+        $totalGuru = User::where('role', 'guru')->count();
+        $pendaftaranAktif = Pendaftaran::where('status', 'terdaftar')->count();
+        $menungguPembayaran = Pendaftaran::where('status', 'menunggu_pembayaran')->count();
 
         return view('dashboard.admin', compact(
             'totalOrangTua',
@@ -37,7 +39,7 @@ class DashboardController extends Controller
     {
         $kelasDiampu = $user->kelasDiampu()
             ->with(['mataPelajaran', 'periode'])
-            ->whereHas('periode', fn($q) => $q->where('status', 'dibuka'))
+            ->whereHas('periode', fn ($q) => $q->where('status', 'dibuka'))
             ->get();
 
         return view('dashboard.guru', compact('kelasDiampu'));

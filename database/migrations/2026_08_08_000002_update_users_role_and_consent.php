@@ -14,7 +14,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'guru', 'orang_tua') NOT NULL");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'guru', 'siswa', 'orang_tua') NOT NULL");
+        }
 
         Schema::table('users', function (Blueprint $table) {
             $table->timestamp('privasi_disetujui_at')->nullable()->after('phone');
@@ -28,6 +30,8 @@ return new class extends Migration
             $table->dropColumn(['privasi_disetujui_at', 'wali_disetujui_at']);
         });
 
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'guru', 'siswa') NOT NULL");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'guru', 'siswa', 'orang_tua') NOT NULL");
+        }
     }
 };

@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Kelas extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'kelas';
 
@@ -58,5 +62,25 @@ class Kelas extends Model
     public function kuotaMinimumTerpenuhi(): bool
     {
         return $this->kuota_terisi >= $this->kuota_minimum;
+    }
+
+    public function scopeAktif(Builder $query): Builder
+    {
+        return $query->where('status', 'aktif');
+    }
+
+    public function scopeKuotaTersedia(Builder $query): Builder
+    {
+        return $query->whereRaw('kuota_terisi < kuota_maksimum');
+    }
+
+    public function scopeByGuru(Builder $query, int $guruId): Builder
+    {
+        return $query->where('guru_id', $guruId);
+    }
+
+    public function scopeByPeriode(Builder $query, int $periodeId): Builder
+    {
+        return $query->where('periode_id', $periodeId);
     }
 }

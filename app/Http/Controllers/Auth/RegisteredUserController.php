@@ -29,7 +29,7 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             // Dua checkbox consent (gambar 1) — wajib dicentang, tidak bisa lanjut tanpanya
             'consent_privasi' => 'accepted',

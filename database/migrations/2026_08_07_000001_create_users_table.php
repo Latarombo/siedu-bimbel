@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->enum('role', ['admin', 'guru', 'siswa']);
+            $table->enum('role', ['admin', 'guru', 'siswa', 'orang_tua']);
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone')->nullable(); // dipakai untuk guru & wali/notifikasi
