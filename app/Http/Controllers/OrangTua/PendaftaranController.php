@@ -6,8 +6,8 @@ namespace App\Http\Controllers\OrangTua;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePendaftaranRequest;
-use App\Models\Anak;
 use App\Models\Kelas;
+use App\Models\Pendaftaran;
 use App\Services\PendaftaranService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\ValidationException;
@@ -21,7 +21,7 @@ class PendaftaranController extends Controller
 
     public function index(): View
     {
-        $pendaftaran = \App\Models\Pendaftaran::whereHas('anak', fn ($q) => $q->where('orang_tua_id', request()->user()->id))
+        $pendaftaran = Pendaftaran::whereHas('anak', fn ($q) => $q->where('orang_tua_id', request()->user()->id))
             ->with(['anak', 'kelas.mataPelajaran', 'kelas.periode'])
             ->latest('diajukan_pada')
             ->paginate(10);
@@ -31,8 +31,8 @@ class PendaftaranController extends Controller
 
     public function create(): View
     {
-        $this->authorize('create', \App\Models\Pendaftaran::class);
-        
+        $this->authorize('create', Pendaftaran::class);
+
         $user = request()->user();
         $anak = $user->anak()->get();
 
@@ -40,7 +40,7 @@ class PendaftaranController extends Controller
         $hasNullJenjang = $anak->contains(fn ($a) => $a->jenjang_terakhir === null);
         if ($hasNullJenjang) {
             return view('orang-tua.pendaftaran.create', compact('anak'))
-                ->with('error', 'Lengkapi jenjang di profil anak dulu. <a href="' . route('orang-tua.anak.index') . '">Ke profil anak</a>');
+                ->with('error', 'Lengkapi jenjang di profil anak dulu. <a href="'.route('orang-tua.anak.index').'">Ke profil anak</a>');
         }
 
         $jenjangList = $anak->pluck('jenjang_terakhir')->unique();

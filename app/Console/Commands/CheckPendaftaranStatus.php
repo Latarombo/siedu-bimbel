@@ -2,21 +2,22 @@
 
 namespace App\Console\Commands;
 
+use App\Events\PendaftaranStatusUpdated;
+use App\Models\Pendaftaran;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use App\Models\Pendaftaran;
-use App\Models\Kelas;
-use App\Events\PendaftaranStatusUpdated;
 
 class CheckPendaftaranStatus extends Command
 {
     protected $signature = 'app:check-pendaftaran-status';
+
     protected $description = 'Check and update pendaftaran status based on payment and timeout';
 
     public function handle(): int
     {
         $this->updateStatusBasedOnPayments();
         $this->cancelOverduePendaftaran();
+
         return Command::SUCCESS;
     }
 
@@ -36,7 +37,7 @@ class CheckPendaftaranStatus extends Command
                 $oldStatus = $pendaftaran->status;
                 $pendaftaran->update(['status' => 'terdaftar']);
                 event(new PendaftaranStatusUpdated($pendaftaran, $oldStatus, 'terdaftar'));
-                Log::info('Pendaftaran #' . $pendaftaran->id . ' updated to terdaftar');
+                Log::info('Pendaftaran #'.$pendaftaran->id.' updated to terdaftar');
             }
         }
     }
@@ -52,7 +53,7 @@ class CheckPendaftaranStatus extends Command
             $pendaftaran->update(['status' => 'dibatalkan_timeout']);
             $pendaftaran->kelas->decrement('kuota_terisi');
             event(new PendaftaranStatusUpdated($pendaftaran, $oldStatus, 'dibatalkan_timeout'));
-            Log::info('Pendaftaran #' . $pendaftaran->id . ' cancelled due to timeout');
+            Log::info('Pendaftaran #'.$pendaftaran->id.' cancelled due to timeout');
         }
     }
 }
