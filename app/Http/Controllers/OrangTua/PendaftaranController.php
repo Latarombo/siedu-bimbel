@@ -62,6 +62,9 @@ class PendaftaranController extends Controller
                 (int) $request->validated('anak_id'),
                 (int) $request->validated('kelas_id'),
             );
+
+            // BR#14: buat record pembayaran pertama (dp/lunas) langsung
+            $this->pendaftaranService->createPaymentRecords($pendaftaran);
         } catch (ValidationException $e) {
             return back()->withInput()->withErrors($e->errors());
         }
