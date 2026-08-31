@@ -83,4 +83,9 @@ class Kelas extends Model
     {
         return $query->where('periode_id', $periodeId);
     }
+
+    public function scopeUntukJenjang(Builder $query, string $jenjang): Builder
+    {
+        return $query->whereHas('mataPelajaran', fn (Builder $q) => $q->where('jenjang', $jenjang));
+    }
 }

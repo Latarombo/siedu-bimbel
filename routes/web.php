@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\MataPelajaranController;
 use App\Http\Controllers\Admin\PeriodePendaftaranController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrangTua\AnakController;
+use App\Http\Controllers\OrangTua\PendaftaranController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicPageController;
 use Illuminate\Support\Facades\Route;
@@ -40,7 +41,7 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(f
 // Khusus Orang Tua (menggantikan aktor Siswa) — F4, F6, F11, F14
 Route::middleware(['auth', 'role:orang_tua'])->prefix('orang-tua')->name('orang-tua.')->group(function () {
     Route::resource('anak', AnakController::class)->except('show');
-    // Route pilih kelas, pendaftaran, pembayaran, pembatalan ditambah di sini nanti
+    Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'create', 'store']);
 });
 
 require __DIR__.'/auth.php';

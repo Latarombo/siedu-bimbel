@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +17,7 @@ class Pendaftaran extends Model
 
     protected $fillable = [
         'anak_id', 'kelas_id', 'periode_id',
-        'metode_bayar', 'status', 'diajukan_pada',
+        'jenjang_saat_daftar', 'metode_bayar', 'status', 'diajukan_pada',
     ];
 
     protected function casts(): array
